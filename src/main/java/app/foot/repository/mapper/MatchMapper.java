@@ -1,5 +1,6 @@
 package app.foot.repository.mapper;
 
+import app.foot.model.CreateGoal;
 import app.foot.model.Match;
 import app.foot.model.PlayerScorer;
 import app.foot.model.TeamMatch;
@@ -34,6 +35,14 @@ public class MatchMapper {
                         .scorers(teamBScorers)
                         .score(teamBScorers.size())
                         .build())
+                .build();
+    }
+
+    public PlayerScoreEntity toDomain(CreateGoal domain){
+        return PlayerScoreEntity.builder()
+                .player(domain.getPlayer())
+                .ownGoal(domain.getIsOG())
+                .minute(domain.getScoreTime())
                 .build();
     }
 
