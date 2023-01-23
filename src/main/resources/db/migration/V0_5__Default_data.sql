@@ -11,6 +11,11 @@ values (1, 'J1', 1),
        (5, 'J5', 3),
        (6, 'J6', 3);
 
+insert into player (id, "name", guardian, id_team)
+values (7, 'G1', true, 1),
+       (8, 'G2', true, 2),
+       (9, 'G3', true, 3);
+
 insert into match(id, id_team_A, id_team_B, stadium, "datetime")
 values (1, 1, 2, 'S1', '2023-01-01 10:00:00'),
        (2, 2, 3, 'S2', '2023-01-01 14:00:00'),
@@ -29,3 +34,6 @@ values (1, 1, 1, 10, false),
 insert into player_score(id, id_match, id_player, "minute", own_goal)
 values (7, 2, 3, 70, false),
        (8, 2, 6, 80, true);
+
+
+ALTER SEQUENCE player_score_id_seq RESTART WITH 9 ;

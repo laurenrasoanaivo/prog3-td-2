@@ -1,6 +1,7 @@
 package app.foot.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity(name = "match")
 @Data
 @EqualsAndHashCode
+@Builder
 public class MatchEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
