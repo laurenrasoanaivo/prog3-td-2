@@ -4,6 +4,7 @@ import app.foot.FootApi;
 import app.foot.controller.HealthController;
 import app.foot.controller.rest.Match;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONString;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,9 +30,8 @@ public class HealthIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
-        String actual = objectMapper.readValue(response.getContentAsString(), String.class);
 
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals("pong", actual.toString());
+        assertEquals("pong", response.getContentAsString());
     }
 }

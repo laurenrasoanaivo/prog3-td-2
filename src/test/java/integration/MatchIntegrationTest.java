@@ -15,13 +15,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.io.DataInput;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,6 +50,14 @@ class MatchIntegrationTest {
 
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(expectedMatch2(), actual);
+    }
+
+    @Test
+    void read_match_by_id_ko() throws Exception {
+        mockMvc.perform(get("/matches/4"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof HttpServerErrorException.InternalServerError))
+                .andExpect(result -> assertEquals("Match#4 not found.", result.getResolvedException().getMessage()));
     }
 
     private static Match expectedMatch2() {
@@ -166,15 +177,13 @@ class MatchIntegrationTest {
         PlayerScorer toCreate = PlayerScorer.builder()
                 .player(player6())
                 .isOG(true)
-                .scoreTime(null)
                 .build();
-        MockHttpServletResponse response = mockMvc
-                .perform(post("/matches/3/goals")
+        mockMvc.perform(post("/matches/3/goals")
                         .content(objectMapper.writeValueAsString(List.of(toCreate)))
                         .contentType("application/json")
                         .accept("application/json"))
-                .andReturn()
-                .getResponse();
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRequestException));
     }
 
 }
