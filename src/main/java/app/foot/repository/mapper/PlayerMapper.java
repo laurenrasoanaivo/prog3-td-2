@@ -1,5 +1,6 @@
 package app.foot.repository.mapper;
 
+import app.foot.controller.rest.UpdatePlayer;
 import app.foot.model.Player;
 import app.foot.model.PlayerScorer;
 import app.foot.repository.MatchRepository;
@@ -50,6 +51,15 @@ public class PlayerMapper {
                 .name(domain.getName())
                 .team(teamRepository.findByName(domain.getTeamName()))
                 .guardian(domain.getIsGuardian())
+                .build();
+    }
+
+    public PlayerEntity toEntity(UpdatePlayer toUpdate) {
+        return PlayerEntity.builder()
+                .id(toUpdate.getId())
+                .name(toUpdate.getName())
+                .guardian(toUpdate.getIsGuardian())
+                .team(playerRepository.findById(toUpdate.getId()).get().getTeam())
                 .build();
     }
 }
