@@ -2,15 +2,21 @@ package integration;
 
 import app.foot.FootApi;
 import app.foot.controller.rest.*;
+import app.foot.controller.rest.mapper.PlayerScorerRestMapper;
+import app.foot.repository.PlayerScoreRepository;
+import app.foot.repository.mapper.PlayerMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.objectweb.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.UnsupportedEncodingException;
@@ -19,8 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static utils.TestUtils.assertThrowsExceptionMessage;
 
@@ -44,6 +49,17 @@ class MatchIntegrationTest {
         assertEquals(3, actual.size());
         assertTrue(actual.containsAll(List.of(expectedMatch1(),
                 expectedMatch2(), expectedMatch3())));
+    }
+
+    @Test
+    @Sql(statements = "update player_score set own_goal = null where id = 1;", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "update player_score set own_goal = false where id = 1;", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void react_matches_ko() throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(get("/matches"))
+                .andExpect((status().isInternalServerError()))
+                .andReturn()
+                .getResponse();
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
     }
 
     private List<Match> convertFromHttpResponse(MockHttpServletResponse response)
@@ -281,6 +297,7 @@ class MatchIntegrationTest {
                         .content(objectMapper.writeValueAsString(List.of(toCreate)))
                         .contentType("application/json")
                         .accept("application/json"))
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
         Match expected = Match.builder()
@@ -291,7 +308,6 @@ class MatchIntegrationTest {
                 .datetime(Instant.parse("2023-01-01T18:00:00Z"))
                 .build();
         Match actual = objectMapper.readValue(response.getContentAsString(), Match.class);
-
         assertEquals(expected, actual);
     }
 

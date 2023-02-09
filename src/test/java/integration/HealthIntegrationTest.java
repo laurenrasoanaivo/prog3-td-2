@@ -1,10 +1,6 @@
 package integration;
 
 import app.foot.FootApi;
-import app.foot.controller.HealthController;
-import app.foot.controller.rest.Match;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONString;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class HealthIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void accept_ok() throws Exception {
